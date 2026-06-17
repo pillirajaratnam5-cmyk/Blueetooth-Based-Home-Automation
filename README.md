@@ -1,4 +1,3 @@
-# Blueetooth-Based-Home-Automation
 # Bluetooth-Based Home Automation System
 
 ## Overview
