@@ -12,7 +12,7 @@ A Bluetooth-enabled home automation system developed using the ARM7 LPC2129 micr
 When the user sends the command **"light on"**, the LED connected to the LPC2129 turns ON and the LCD displays the corresponding status.
 
 <p align="center">
-  <img src="images/light_on.png" width="700">
+  <img src="images/Light%20On.png" width="700">
 </p>
 
 ---
