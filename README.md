@@ -139,7 +139,7 @@ LED Control   L293D Driver
 ## Proteus Simulation
 
 ### Schematic
-![Bluetooth Home Automation]([docs/proteus_schematic.png](https://github.com/pillirajaratnam5-cmyk/Blueetooth-Based-Home-Automation/blob/main/images/Blueetoth%20Based%20Home%20Automatioin.png))
+![Bluetooth Home Automation]<img src="images/Blueetoth Based Home Automatioin.png" width="700">
 
 ---
 
