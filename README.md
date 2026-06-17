@@ -195,4 +195,4 @@ Bluetooth-Home-Automation/
 
 **Raja Ratnam Pilli**
 
-Embedded Systems Engineer | ARM | Embedded C | IoT Enthusiast
+Embedded Systems Engineer | ARM | Embedded C 
