@@ -42,7 +42,7 @@ When the command **"motor on"** is received, the LPC2129 drives the L293D motor 
 When the command **"motor off"** is received, the motor is stopped and the LCD displays the updated state.
 
 <p align="center">
-  <>
+  <images/Motor Off.png>
 </p>
 
 ---
