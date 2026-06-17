@@ -1,23 +1,156 @@
 # Blueetooth-Based-Home-Automation
-
+# Bluetooth-Based Home Automation System
 
 ## Overview
-This project implements a serial-controlled home automation system utilizing an ARM7TDMI microcontroller. It parses ASCII string commands received via UART to actuate physical peripherals, specifically an LED indicator and a DC motor. System status and command acknowledgments are displayed on an interfaced 16x2 character LCD.
+A Bluetooth-enabled home automation system developed using the ARM7 LPC2129 microcontroller. The system allows users to control home appliances wirelessly through serial commands transmitted via a Bluetooth module. Commands are processed by the microcontroller to control connected devices such as LEDs and DC motors, while real-time status updates are displayed on a 16x2 LCD.
 
-## Hardware & Toolchain
-* **Microcontroller:** NXP LPC2129 (Firmware Target) / NXP LPC2124 (Simulation Target)
-* **Peripherals:** LM016L 16x2 LCD, L293D Motor Driver, DC Motor, Yellow LED, Serial Terminal (Bluetooth HC-05/HC-06 proxy)
-* **Toolchain:** Keil uVision, ARM-ADS compiler
-* **Simulation:** Proteus 8 Professional
+---
+
+## Features
+- Wireless appliance control using Bluetooth communication
+- Real-time command processing through UART
+- LED ON/OFF control
+- DC Motor ON/OFF control using L293D motor driver
+- Status display on 16x2 LCD
+- User-friendly command interface
+- Embedded C firmware implementation
+- Proteus-based simulation and testing
+
+---
+
+## Hardware Components
+- ARM7 LPC2129 / LPC2124 Microcontroller
+- HC-05 Bluetooth Module (or Serial Terminal in Simulation)
+- LM016L 16x2 LCD Display
+- L293D Motor Driver IC
+- DC Motor
+- LED Indicator
+- Power Supply
+
+---
+
+## Software Tools
+- Keil uVision
+- Embedded C
+- Proteus 8 Professional
+
+---
 
 ## Pin Configuration
-* **UART0:** `P0.0` (TXD) and `P0.1` (RXD) for serial communication.
-* **LED Control (`LED_1`):** `P0.10`.
-* **Motor Control (`MOTOR_IN1`, `MOTOR_IN2`):** `P0.12` and `P0.13` via L293D H-Bridge.
+
+| Function | LPC2129 Pin |
+|-----------|------------|
+| UART0 TXD | P0.0 |
+| UART0 RXD | P0.1 |
+| LED Control | P0.10 |
+| Motor IN1 | P0.12 |
+| Motor IN2 | P0.13 |
+
+---
 
 ## Command Protocol
-The firmware polls the UART for character strings terminated by a carriage return (`\r`) or line feed (`\n`). Input is normalized to lowercase before processing.
-* `light on`: Drives `P0.10` HIGH, illuminates LED, updates LCD.
-* `light off`: Drives `P0.10` LOW, extinguishes LED, updates LCD.
-* `motor on`: Drives `P0.12` HIGH and `P0.13` LOW, engaging the DC motor.
-* `motor off`: Drives both `P0.12` and `P0.13` LOW, halting the DC motor.
+
+| Command | Action |
+|----------|---------|
+| light on | Turn LED ON |
+| light off | Turn LED OFF |
+| motor on | Start Motor |
+| motor off | Stop Motor |
+
+---
+
+## System Architecture
+
+```text
+Mobile Application
+        │
+        ▼
+ HC-05 Bluetooth Module
+        │
+        ▼
+ ARM7 LPC2129 Controller
+        │
+ ┌──────┴────────┐
+ ▼               ▼
+LED Control   L293D Driver
+                  │
+                  ▼
+               DC Motor
+
+        ▼
+   16x2 LCD Display
+```
+
+---
+
+## Working Principle
+1. The user sends a command from a smartphone via Bluetooth.
+2. The HC-05 Bluetooth module receives the command.
+3. The LPC2129 microcontroller reads the command through UART communication.
+4. Based on the received command, the controller performs the corresponding action:
+   - Switches LED ON/OFF
+   - Starts or stops the DC motor
+5. The current system status is displayed on the 16x2 LCD.
+
+---
+
+## Proteus Simulation
+
+### Schematic
+![Bluetooth Home Automation](docs/proteus_schematic.png)
+
+---
+
+## Project Structure
+
+```text
+Bluetooth-Home-Automation/
+│
+├── Source/
+│   ├── main.c
+│   ├── uart.c
+│   ├── lcd.c
+│   ├── motor.c
+│
+├── Header/
+│   ├── uart.h
+│   ├── lcd.h
+│   ├── motor.h
+│
+├── Proteus/
+│   └── HomeAutomation.pdsprj
+│
+├── Docs/
+│   └── proteus_schematic.png
+│
+└── README.md
+```
+
+---
+
+## Future Enhancements
+- Smartphone Android Application Integration
+- Multiple Appliance Control
+- Password-Based Authentication
+- IoT Cloud Monitoring
+- Voice Command Support
+- MQTT-Based Smart Home Automation
+
+---
+
+## Learning Outcomes
+- ARM7 Microcontroller Programming
+- UART Communication
+- Embedded C Development
+- LCD Interfacing
+- Motor Driver Interfacing
+- Bluetooth Communication
+- Embedded System Design and Debugging
+
+---
+
+## Author
+
+**Raja Ratnam Pilli**
+
+Embedded Systems Engineer | ARM | Embedded C | IoT Enthusiast
