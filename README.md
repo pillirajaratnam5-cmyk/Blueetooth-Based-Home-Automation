@@ -5,6 +5,48 @@
 A Bluetooth-enabled home automation system developed using the ARM7 LPC2129 microcontroller. The system allows users to control home appliances wirelessly through serial commands transmitted via a Bluetooth module. Commands are processed by the microcontroller to control connected devices such as LEDs and DC motors, while real-time status updates are displayed on a 16x2 LCD.
 
 ---
+# Project Demonstration
+
+## 1. Light ON
+
+When the user sends the command **"light on"**, the LED connected to the LPC2129 turns ON and the LCD displays the corresponding status.
+
+<p align="center">
+  <img src="images/light_on.png" width="700">
+</p>
+
+---
+
+## 2. Light OFF
+
+When the user sends the command **"light off"**, the LED turns OFF and the LCD updates the status.
+
+<p align="center">
+  <img src="images/light_off.png" width="700">
+</p>
+
+---
+
+## 3. Motor ON
+
+When the command **"motor on"** is received, the LPC2129 drives the L293D motor driver to rotate the DC motor.
+
+<p align="center">
+  <img src="images/motor_on.png" width="700">
+</p>
+
+---
+
+## 4. Motor OFF
+
+When the command **"motor off"** is received, the motor is stopped and the LCD displays the updated state.
+
+<p align="center">
+  <img src="images/motor_off.png" width="700">
+</p>
+
+---
+
 
 ## Features
 - Wireless appliance control using Bluetooth communication
