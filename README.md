@@ -22,7 +22,7 @@ When the user sends the command **"light on"**, the LED connected to the LPC2129
 When the user sends the command **"light off"**, the LED turns OFF and the LCD updates the status.
 
 <p align="center">
-  <img src="images/light_off.png" width="700">
+  <img src="images/Light off.png" width="700">
 </p>
 
 ---
