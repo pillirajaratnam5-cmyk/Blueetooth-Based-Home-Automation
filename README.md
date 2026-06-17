@@ -32,7 +32,7 @@ When the user sends the command **"light off"**, the LED turns OFF and the LCD u
 When the command **"motor on"** is received, the LPC2129 drives the L293D motor driver to rotate the DC motor.
 
 <p align="center">
-  <img src="images/motor_on.png" width="700">
+  <img src="images/Motor on.png" width="700">
 </p>
 
 ---
@@ -42,7 +42,7 @@ When the command **"motor on"** is received, the LPC2129 drives the L293D motor 
 When the command **"motor off"** is received, the motor is stopped and the LCD displays the updated state.
 
 <p align="center">
-  <img src="images/motor_off.png" width="700">
+  <>
 </p>
 
 ---
