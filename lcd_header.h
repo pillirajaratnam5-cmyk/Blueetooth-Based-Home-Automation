@@ -1,0 +1,48 @@
+#include <lpc21xx.h>
+#include"delay_millisec.h"
+#define RS      (1 << 2)     
+#define E     (1 << 3)     
+#define LCD_D (0x0F << 4)  
+
+
+void LCD_Command(unsigned char cmd) 
+	{
+    IOCLR0 = RS | LCD_D; 
+    IOSET0 = ((cmd >> 4) & 0x0F) << 4; 
+    IOSET0 = E;
+	delay_millisec(2); 
+		IOCLR0 = E;
+    
+    IOCLR0 = LCD_D;
+    IOSET0 = (cmd & 0x0F) << 4; 
+    IOSET0 = E; 
+		delay_millisec(2); 
+		IOCLR0 = E;
+}
+
+void LCD_Data(unsigned char data) {
+    IOSET0 = RS; 
+    IOCLR0 = LCD_D;
+    IOSET0 = ((data >> 4) & 0x0F) << 4; 
+    IOSET0 = E; 
+	delay_millisec(2); 
+	IOCLR0 = E;
+    
+    IOCLR0 = LCD_D;
+    IOSET0 = (data & 0x0F) << 4; 
+    IOSET0 = E;
+	delay_millisec(2); 
+	IOCLR0 =E;
+}
+
+void LCD_Init(void) {
+    delay_millisec(20);
+    LCD_Command(0x02); 
+    LCD_Command(0x28); 
+    LCD_Command(0x0C); 
+    LCD_Command(0x01); 
+}
+
+void LCD_String(char *str) {
+    while(*str) LCD_Data(*str++);
+}
