@@ -1,165 +1,126 @@
-#include <LPC21xx.h>
+#include <lpc21xx.h>
 #include <string.h>
-#include <stdio.h>
-#include "hw_config.h"
-#include "system.h"
-int main() 
-	{
-    char pass[PASS_LEN + 1];        
-    char otp_in[PASS_LEN + 1];      
-    char otp_str[PASS_LEN + 1];     
-    unsigned int otp_num;           
-    unsigned char pass_try = 0;     
-    unsigned char otp_try  = 0;     
-    unsigned char b; 
-    unsigned int i;	
-   
-    VPBDIV = 0x00;                  
-    T0PR  = 0;
-    T0TCR = 0x01; 
-    
-    PINSEL0 |= 0x00000055;
-    PINSEL1 = 0x00000000;
-    PINSEL2 = 0x00000000;		
-    IODIR0 |= LED|LED2| MOTOR_IN1 | ALL_ROWS;
-    IODIR0 |= ~ALL_COLS;   
-    IODIR0 &= ~SWITCH; 
-    IODIR1 |= MOTOR_IN2;
+#include <ctype.h>
+#include "lcd_header.h"
 
-    IOCLR0 = LED|LED2| MOTOR_IN1;
-    IOCLR1 = MOTOR_IN2;
-    IOSET0 = ALL_ROWS; 
+#define LED_1     (1 << 17)     
+#define MOTOR_IN1    (1 << 12)   
+#define MOTOR_IN2    (1 << 13)     
 
-    UART0_INIT();
-    I2C_INIT();
-    LCD_INIT();
-    Keypad_Init();
-    
-    UART0_STR("\r\nDefault Password : 1234\r\n");
-    GSM_Init(); 
+void UART0_CONFIG(void);           
+void UART0_TX(char ch);            
+char UART0_RX(void);               
+void UART0_TX_STR(char *str);      
+void ReceiveString(char *buffer);
+void ProcessCommand(char *buffer);
 
-    IOCLR0 = ROW3; 
-    delay_ms(10);
-			
-    EEPROM_StorePassword();
-    UART0_STR("Password 1234 saved to EEPROM!\r\n");
-    delay_sec(2);
-     
-    IOSET0 = ROW3; 
-
-    LCD_CMD(0x01); 
-    LCD_CMD(0x80); 
-    
-   LCD_CMD(0x01); 
-    LCD_CMD(0x80); 
-   
-    LCD_STR("Multilevel Security Based Control System");
-    delay_ms(700); 
-   
-    for(i = 0; i < 40; i++) {
-        LCD_CMD(0x18);   
-        delay_ms(300);   
+int main(void) {
+    char inputBuffer[30];
+	
+    PINSEL0 = 0x00000005;  
+    IODIR0 |= LED_1 | MOTOR_IN1 | MOTOR_IN2 | RS | E | LCD_D;
+    IOSET0 = LED_1;               
+    IOCLR0 = MOTOR_IN1 | MOTOR_IN2; 
+  
+    UART0_CONFIG(); 
+    LCD_Init();  
+    LCD_Command(0x80);
+    LCD_String("Bluetooth Based ");
+    LCD_Command(0xC0);
+    LCD_String("Home Automation");
+    while(1) {
+        ReceiveString(inputBuffer);
+        ProcessCommand(inputBuffer);
     }
-    while(1)
-			{
-        pass_try = 0;   
-        while(1) 
-					{
-            LCD_CMD(0x01);
-            LCD_CMD(0x80); 
-            LCD_STR("Enter Password:");
-            LCD_CMD(0xC0); 
-            GetPassword(pass);            
-            delay_ms(500); 
-            
-            if(Check_Password(pass)) 
-							{
-                break; 	
-            } 
-					else 
-						{
-                pass_try++;
-                LCD_CMD(0x01);
-                LCD_CMD(0x80); 
-						    LCD_STR("Wrong Password!");
-                
-                IOSET0 = LED2; 
-						    delay_ms(400); 
-						    IOCLR0 = LED2;
-                delay_ms(700); 
-                
-                if(pass_try >= 3) {
-                    LCD_CMD(0x01);
-                    LCD_CMD(0x80); 
-                    LCD_STR("System Locked!");
-                    GSM_SendBreach(); 
-                    
-                    for(b = 0; b < 6; b++) { 
-                        IOSET0 = LED; delay_ms(200);
-                        IOCLR0 = LED; delay_ms(200);
-                    } 
-                    delay_sec(10);
-                    pass_try = 0; 
-                }
-            }
-        }
-        LCD_CMD(0x01);
-        LCD_CMD(0x80); 
-        LCD_STR("Press SW for OTP");
-        UART0_STR("\r\nPress Switch for OTP\r\n");
-        
-        while(IOPIN0 & SWITCH);        
-        delay_ms(30);                  
-        while(!(IOPIN0 & SWITCH));     
-        otp_num = (T0TC % 9000) + 1000;    
-        sprintf(otp_str, "%04u", otp_num); 
-        
-        UART0_STR("Send OTP Successfully\r\n");
-        GSM_SendOTP(otp_num);
+}
 
-        otp_try = 0;
-        while(1) {
-            LCD_CMD(0x01);
-            LCD_CMD(0x80); 
-            LCD_STR("Enter OTP:");
-            LCD_CMD(0xC0); 
-            GetOTP(otp_in);              
-            delay_ms(500); 
-            
-            if(strcmp(otp_in, otp_str) == 0) {
-                LCD_CMD(0x01);
-                LCD_CMD(0x80);
-                LCD_STR("ACCESS GRANTED");
-                UART0_STR("ACCESS GRANTED\r\n");
-                IOSET0 = (1<<4);            
-                
-                IOSET0 = MOTOR_IN1;
-                IOCLR0 = MOTOR_IN2; 
-                delay_sec(500);    
-                IOCLR0 = MOTOR_IN1;
-                IOCLR0 = MOTOR_IN2;     
-                IOCLR0 = (1<<4);           
-                break;
-            }
-            else 
-							{
-                otp_try++;
-                LCD_CMD(0x01);
-                LCD_CMD(0x80); 
-                LCD_STR("Wrong  OTP!");
-                IOSET0 = LED2; 
-                delay_ms(400); 
-                IOCLR0 = LED2;
-                
-                delay_ms(700); 
-                
-                if(otp_try >= 3) {
-                    LCD_CMD(0x01);
-                    LCD_CMD(0x80); LCD_STR("OTP Expired!");
-                    delay_sec(2);
-                    break; 
-                }
-            }
-        }
-    } 
+void ProcessCommand(char *buffer) 
+	{
+    int i;
+    for(i = 0; buffer[i]; i++)
+		{
+        buffer[i] = tolower(buffer[i]);
+    }
+    LCD_Command(0x01); 
+    LCD_Command(0x80); 
+   
+    UART0_TX_STR("\r\n"); 
+    if (strcmp(buffer, "light on") == 0) 
+			{
+        IOCLR0 = LED_1;             
+        LCD_String("LIGHT IS ON");
+      }
+    else if (strcmp(buffer, "light off") == 0) 
+			{
+        IOSET0 = LED_1;             
+        LCD_String("LIGHT IS OFF");
+      }
+   else if (strcmp(buffer, "motor on") == 0) 
+			{
+        IOSET0 = MOTOR_IN1;
+        IOCLR0=MOTOR_IN2;			
+        LCD_String("MOTOR IS ON");
+      }
+    else if (strcmp(buffer, "motor off") == 0) 
+			{
+				delay_millisec(10);
+        IOCLR0 = MOTOR_IN1 | MOTOR_IN2; 
+        LCD_String("MOTOR IS OFF");
+      }
+			else if (strcmp(buffer, "all on") == 0) 
+			{
+				delay_millisec(10);
+				IOSET0=MOTOR_IN1;
+        IOCLR0 = LED_1|MOTOR_IN2; 
+        LCD_String("ALL ARE ON");
+      }
+			else if(strcmp(buffer,"all off")==0)
+			{
+				delay_millisec(10);
+				IOCLR0=MOTOR_IN1|MOTOR_IN2;
+				IOSET0=LED_1;
+				LCD_String("ALL ARE OFF");
+			}
+    else 
+			{
+        LCD_String("INVALID CMD");
+      } 
+}
+
+void UART0_CONFIG(void) {
+    U0LCR = 0x83;
+    U0DLL = 97;   
+    U0DLM = 0;
+    U0LCR = 0x03; 
+}
+
+void UART0_TX(char ch) {
+    while(!(U0LSR & 0x20)); 
+    U0THR = ch;
+}
+
+char UART0_RX(void) 
+	{
+    while(!(U0LSR & 0x01)); 
+    return U0RBR;
+  }
+
+void UART0_TX_STR(char *str)
+	{
+    while(*str)
+			{
+        UART0_TX(*str++);
+      }
+  }
+
+void ReceiveString(char *buffer) {
+    int i = 0;
+    char ch;
+    while(1) {
+        ch = UART0_RX();
+        if(ch == '\r' || ch == '\n') break;
+        buffer[i++] = ch;
+        UART0_TX(ch);
+    }
+    buffer[i] = '\0';
 }
